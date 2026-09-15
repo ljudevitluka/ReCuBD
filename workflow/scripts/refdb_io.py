@@ -80,7 +80,7 @@ def term_regex(terms):
     if not terms:
         return re.compile(r"(?!x)x")
     parts = [re.escape(t.strip()) for t in terms if t.strip()]
-    return re.compile(r"\b(" + "|".join(parts) + r")", re.I)
+    return re.compile(r"\b(?:" + "|".join(parts) + r")", re.I)
 
 
 def build_entrez_query(search_terms, virus_taxid_root):

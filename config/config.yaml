@@ -32,6 +32,21 @@ curation:
     near_complete_min_pct: 85     # % of the family-calibrated reference length
     substantial_fragment_min_pct: 50
 
+similarity:
+  # A candidate from augmentation shares only an NCBI taxid with the host-derived
+  # record it would replace, and taxids are assigned by submitters: for novel virome
+  # taxa one taxid can bin sequences 75-90% identical or less, or a different genome
+  # segment. A candidate must clear this gate or the host-derived record is kept.
+  kmer_size: 21
+  # Fraction of the host record's canonical k-mers found in the candidate. At k=21,
+  # 0.9 ~ 99.5% estimated ANI, 0.5 ~ 96.7%, 0.2 ~ 92.3%, 0.05 ~ 85.8%.
+  min_containment: 0.5
+  # Reject a candidate whose /segment label contradicts the host record's.
+  enforce_segment_match: true
+  # Work bounds: candidates screened per taxon/segment, host records compared against.
+  max_candidates_per_taxon: 3
+  max_host_records_per_taxon: 5
+
 augmentation:
   # For a virus reported from the host taxon but represented only by fragments,
   # pull the complete genome deposited from any other host.

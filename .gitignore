@@ -4,6 +4,3 @@ results_test/
 __pycache__/
 *.pyc
 .DS_Store
-
-# Source archive
-host-virus-refdb.zip

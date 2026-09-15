@@ -1,9 +1,25 @@
-# Terms that define the host taxon.
+# Terms that define the host taxon. Replace this file to target a different one.
 #   field : any Entrez field, e.g. "All Fields", "Organism", "Title"
 #   use   : query  -> only used to retrieve records
 #           name   -> only used to recognise host-named viruses (e.g. "shrimp" in a virus name)
 #           both   -> used for both
-# Replace this file to target a different host taxon.
+#
+# Choosing `use`. The name-side regex does two jobs: it keeps a virus in tier 1 when its own
+# name carries a host term even though its family is listed as environmental in
+# tier2_groups.tsv, and it accepts a record with no /host qualifier when the virus name names
+# the host. Both depend on how viruses are actually named -- after a genus, species or
+# vernacular (Cherax quadricarinatus iridovirus; signal crayfish associated hepe-like virus 1).
+# So:
+#   both  -- genus names and single-word vernaculars: they retrieve records AND appear in names.
+#   name  -- terms that must NOT enter the query. "shrimp", "prawn", "decapod" and "penstyl"
+#            would each pull in thousands of penaeid records and break the crayfish-only scope,
+#            but they must be recognised in names so Decapod penstyldensovirus 1 and Shrimp
+#            white spot syndrome virus stay in tier 1.
+#   query -- terms safe to search that would never occur in a virus name: family and infraorder
+#            names, multi-word vernaculars. No viral record in GenBank carries a crayfish FAMILY
+#            name in its organism name, so the four family rows below are forward-looking safety
+#            nets (they would catch a future /host="Cambaridae sp." deposit) and currently match
+#            nothing; an OR clause that matches nothing cannot change the result set.
 term	field	use	note
 Astacus	All Fields	both	European crayfish genus
 Pontastacus	All Fields	both	current genus of A. leptodactylus

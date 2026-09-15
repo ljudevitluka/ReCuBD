@@ -14,6 +14,8 @@ import re
 import textwrap
 from string import Template
 
+import pandas as pd
+
 import refdb_io
 
 TIER1 = "tier1_host_and_related"
@@ -22,7 +24,9 @@ COLS = ["accession", "version", "organism", "taxid", "virus_family", "virus_orde
         "lineage", "tier", "probable_host_class", "genome_status", "length",
         "pct_of_group_reference", "segment", "moltype", "topology", "n_cds", "products", "host",
         "host_scientific_name", "host_evidence", "from_host_taxon", "country", "collection_date",
-        "strain", "refseq", "pubmed", "create_date", "update_date", "definition"]
+        "strain", "refseq", "pubmed", "kmer_containment_to_host_record",
+        "est_ani_to_host_record_pct", "compared_with_host_accession",
+        "create_date", "update_date", "definition"]
 RENAME = {"organism": "virus_name", "length": "length_bp", "host": "host_qualifier_raw",
           "host_evidence": "host_taxon_evidence"}
 
@@ -47,6 +51,8 @@ isolate came from a host outside the target taxon (`from_host_taxon = False`); t
 $n_target representatives are host-taxon-derived. $t1_usable of $n_t1 tier-1 representatives are
 complete, coding-complete or near-complete.
 
+$screen_txt
+
 ## Contents
 
 | File | Records | Description |
@@ -58,6 +64,7 @@ complete, coding-complete or near-complete.
 | `${dataset}_all_records.tsv` | $curated | Every curated host-taxon record, before representative selection |
 | `${dataset}_species_summary.tsv` | $n_species | One row per virus taxon: hosts, countries, years, representative |
 | `${dataset}_excluded_records.tsv` | $excluded | Retrieved but rejected, with reasons (audit trail) |
+| `tables/augment_similarity_audit.tsv` | $n_audit | Every screened candidate reference genome, with containment score and verdict |
 
 FASTA headers: `accession.version | virus name | segment= | family= | genome status | host= | country= | length`
 
@@ -142,11 +149,16 @@ def main():
     ap.add_argument("--terms", required=True)
     ap.add_argument("--host-accept", required=True)
     ap.add_argument("--tier2", required=True)
+    ap.add_argument("--audit", default="",
+                    help="augment_similarity_audit.tsv from the screening step")
     ap.add_argument("--outdir", required=True)
     ap.add_argument("--dataset", required=True)
     args = ap.parse_args()
 
     cfg = json.load(open(args.config_json, encoding="utf-8"))
+    sim_cfg = cfg.get("similarity", {})
+    min_cont = float(sim_cfg.get("min_containment", 0.5))
+    kmer_size = int(sim_cfg.get("kmer_size", 21))
     pool = refdb_io.read_table(args.pooled)
     reps = refdb_io.read_table(args.reps)
     seqs = read_fasta(args.fasta)
@@ -215,7 +227,33 @@ def main():
     exc_counts = excluded.exclusion_reason.str.slice(0, 70).value_counts().to_frame("records")
     meta = json.load(open(args.meta, encoding="utf-8"))
 
+    n_audit, screen_txt = 0, "Augmentation was disabled, so no species-level references were considered."
+    if args.audit and os.path.exists(args.audit):
+        aud = pd.read_csv(args.audit, sep="\t")
+        n_audit = len(aud)
+        if n_audit:
+            npass = int((aud.gate == "pass").sum())
+            cont = (pd.to_numeric(reps.loc[~reps.from_host_taxon,
+                                            "kmer_containment_to_host_record"], errors="coerce")
+                    .dropna() if "kmer_containment_to_host_record" in reps.columns
+                    else pd.Series(dtype=float))
+            screen_txt = (
+                "%d candidate reference genomes were screened for similarity to the host-derived "
+                "records of their own taxid: %d cleared the %.2f containment threshold and %d were "
+                "rejected, of which %d shared no %d-mer with any host-derived record and %d carried a "
+                "contradictory /segment label. Where a candidate was rejected the host-derived record "
+                "was kept, so those taxa are represented by what was actually sequenced from the host. "
+                "The imported references that were delivered span %.2f-%.2f containment (median %.2f)."
+                % (n_audit, npass, min_cont, n_audit - npass,
+                   int((aud.kmer_containment == 0).sum()), kmer_size,
+                   int((aud.segment_check == "conflict").sum()),
+                   cont.min() if len(cont) else 0.0, cont.max() if len(cont) else 0.0,
+                   cont.median() if len(cont) else 0.0))
+        else:
+            screen_txt = "No candidate reference genomes were available to screen."
+
     report = Template(textwrap.dedent(REPORT)).safe_substitute(
+        screen_txt=screen_txt, n_audit=n_audit,
         dataset=args.dataset, date=datetime.date.today().isoformat(),
         query=open(args.query, encoding="utf-8").read().strip(),
         hits=meta["hit_count"], parsed=len(pool),

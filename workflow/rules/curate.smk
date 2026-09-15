@@ -44,3 +44,27 @@ rule annotate:
     shell:
         '"{params.py}" "{params.script}" --config-json {input.cfg} --table {input.table} '
         "--tier2 {input.tier2} --terms {input.terms} --out {output.table} > {log} 2>&1"
+
+
+rule screen_augmented:
+    """Require a candidate reference genome to resemble the host-derived records of
+    its own taxid before it may compete for the representative slot."""
+    input:
+        cfg=CONFIG_JSON,
+        annotated=rules.annotate.output.table,
+        augment=rules.augment_references.output.table,
+    output:
+        passed=f"{RES}/tables/augment_screened.tsv.gz",
+        audit=f"{RES}/tables/augment_similarity_audit.tsv",
+    log:
+        f"{RES}/logs/screen_augmented.log",
+    params:
+        py=PY,
+        script=SCRIPTS / "screen_augmented.py",
+        cache=f"{RES}/seq/screened_candidates.fasta",
+    conda:
+        ENV
+    shell:
+        '"{params.py}" "{params.script}" --config-json {input.cfg} --annotated {input.annotated} '
+        "--augment {input.augment} --cache {params.cache} "
+        "--out-passed {output.passed} --out-audit {output.audit} > {log} 2>&1"

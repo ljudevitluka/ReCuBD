@@ -35,6 +35,7 @@ def final_outputs():
         f"{RES}/{DATASET}_all_records.tsv",
         f"{RES}/{DATASET}_excluded_records.tsv",
         f"{RES}/README_{DATASET}_refdb.md",
+        f"{RES}/tables/augment_similarity_audit.tsv",
     ]
     if config["outputs"].get("plot", True):
         out.append(f"{RES}/{DATASET}_refdb_overview.png")

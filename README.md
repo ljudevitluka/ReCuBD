@@ -1,8 +1,9 @@
 # host-virus-refdb
 
 A Snakemake workflow that builds a curated, reproducible **virus reference database for a host
-taxon** from NCBI GenBank/RefSeq. Three tab-separated input files define the scope, so the same 
-workflow builds a database for any host group.
+taxon** from NCBI GenBank/RefSeq. Nothing about the target taxon is hard-coded: three tab-separated
+input files define the scope, so the same workflow builds a crayfish database, a shrimp database, or
+a database for any other host group.
 
 It was written for crayfish virome work (the shipped `config/` reproduces that build), but the only
 taxon-specific knowledge lives in the input files.
@@ -11,13 +12,14 @@ taxon-specific knowledge lives in the input files.
 
 | Output | Description |
 |---|---|
-| `<dataset>_refdb_tier1.fasta` | Representative viral genomes plausibly infecting the host taxon or its relatives |
+| `<dataset>_refdb_tier1.fasta` | Representative genomes plausibly infecting the host taxon or its relatives |
 | `<dataset>_refdb_tier2.fasta` | Viruses of plants, fungi, algae and gut bacteria recovered from the same samples — a decoy set for read screening |
-| `<dataset>_refdb_all.fasta` | Fasta file containing sequences belonging to both tiers |
+| `<dataset>_refdb_all.fasta` | Both tiers |
 | `<dataset>_reference_genomes.tsv` | Metadata for every sequence in the FASTA files (30 columns) |
 | `<dataset>_all_records.tsv` | Every curated host-taxon record, before representative selection |
 | `<dataset>_species_summary.tsv` | One row per virus taxon: hosts, countries, years, PubMed IDs, representative |
 | `<dataset>_excluded_records.tsv` | Retrieved but rejected, each with its reason — the audit trail |
+| `tables/augment_similarity_audit.tsv` | Every screened candidate reference genome with its containment score and pass/fail reason |
 | `<dataset>_refdb_overview.png` | Composition figure |
 | `README_<dataset>_refdb.md` | Build report: exact query, counts, method, caveats |
 
@@ -85,9 +87,24 @@ Then set `outputs.dataset_name` in `config/config.yaml` and run. A worked second
    fragment, then RefSeq, then host-derived, then longest. Placeholder taxa (`Picornavirales sp.`
    and friends) are kept per accession, never collapsed — one such taxid is shared by unrelated
    viruses.
-6. **Species-level references** — for a virus reported from your taxon but represented only by
-   fragments, the complete genome deposited from another host is added and flagged
-   `from_host_taxon = False`, so you can filter it out.
+6. **Species-level references, screened** — for a virus reported from your taxon but represented
+   only by fragments, complete genomes deposited from other hosts are retrieved as candidates.
+   A candidate shares only an NCBI taxid with the record it would replace, and taxids are
+   assigned by submitters: for novel virome taxa one taxid routinely bins sequences 75–90%
+   identical or less, and occasionally a different genome segment. So every candidate is screened
+   before it may compete — canonical k-mer containment against the host-derived records of its own
+   taxid, plus rejection on a contradictory `/segment` label. A candidate below
+   `similarity.min_containment` is dropped and the host-derived record is kept. Survivors are
+   flagged `from_host_taxon = False` and carry `kmer_containment_to_host_record`,
+   `est_ani_to_host_record_pct` and `compared_with_host_accession`; every screened candidate,
+   passed or rejected, is listed with its score in `results/tables/augment_similarity_audit.tsv`.
+
+   Containment is the fraction of the host record's k-mers found in the candidate; estimated ANI
+   is the Mash containment estimate `1 + ln(C)/k`. At k=21, C=0.9 ≈ 99.5% ANI, 0.5 ≈ 96.7%,
+   0.2 ≈ 92.3%, 0.05 ≈ 85.8%. The measure saturates below roughly 90% identity — read low values
+   as "clearly divergent" rather than as precise ANI. Raise `min_containment` toward 0.9 to admit
+   only near-identical isolates, lower it to admit strain-level variation, or set
+   `augmentation.enabled: false` to use host-derived sequences only.
 
 ## Workflow structure
 

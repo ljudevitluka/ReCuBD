@@ -7,7 +7,7 @@ rule select_representatives:
     input:
         cfg=CONFIG_JSON,
         annotated=rules.annotate.output.table,
-        augment=rules.augment_references.output.table,
+        augment=rules.screen_augmented.output.passed,
         tier2=IN["tier2_groups"],
         terms=IN["search_terms"],
     output:
@@ -37,6 +37,7 @@ rule write_outputs:
         terms=IN["search_terms"],
         host_accept=IN["host_accept"],
         tier2=IN["tier2_groups"],
+        audit=rules.screen_augmented.output.audit,
     output:
         tier1=f"{RES}/{DATASET}_refdb_tier1.fasta",
         tier2fa=f"{RES}/{DATASET}_refdb_tier2.fasta",
@@ -59,6 +60,7 @@ rule write_outputs:
         '"{params.py}" "{params.script}" --config-json {input.cfg} --pooled {input.pooled} '
         "--reps {input.reps} --fasta {input.fasta} --query {input.query} --meta {input.meta} "
         "--terms {input.terms} --host-accept {input.host_accept} --tier2 {input.tier2} "
+        "--audit {input.audit} "
         "--outdir {params.outdir} --dataset {params.dataset} > {log} 2>&1"
 
 
