@@ -1,13 +1,9 @@
-# Operating-system files
+results/
+results_test/
+.snakemake/
+__pycache__/
+*.pyc
 .DS_Store
-Thumbs.db
 
-# Editor files
-.vscode/
-
-# Temporary and log files
-*.tmp
-*.log
-
-# Local environment files
-.env
+# Source archive
+host-virus-refdb.zip

@@ -1,0 +1,78 @@
+# host-virus-refdb -- build a curated virus reference database for any host taxon.
+# Run from the repository root:
+#     snakemake --cores 1
+# Retarget it by editing the three input files named in config/config.yaml.
+import json
+from pathlib import Path
+
+from snakemake.utils import min_version
+
+min_version("7.32")
+
+
+configfile: "config/config.yaml"
+
+
+DATASET = config["outputs"]["dataset_name"]
+RES = config["outputs"]["prefix"].rstrip("/")
+IN = config["inputs"]
+SCRIPTS = Path(workflow.basedir) / "scripts"
+# Interpreter used to run the step scripts. "python" is correct inside any conda
+# env; set runtime.python_exe to "python3" (or an absolute path) on a system
+# where "python" is absent, e.g. a bare Debian/Ubuntu server without conda.
+PY = config.get("runtime", {}).get("python_exe", "python")
+ENV = "../envs/refdb.yaml"          # relative to workflow/rules/, where the rules live
+CONFIG_JSON = f"{RES}/effective_config.json"
+
+
+def final_outputs():
+    out = [
+        f"{RES}/{DATASET}_refdb_tier1.fasta",
+        f"{RES}/{DATASET}_refdb_tier2.fasta",
+        f"{RES}/{DATASET}_refdb_all.fasta",
+        f"{RES}/{DATASET}_reference_genomes.tsv",
+        f"{RES}/{DATASET}_species_summary.tsv",
+        f"{RES}/{DATASET}_all_records.tsv",
+        f"{RES}/{DATASET}_excluded_records.tsv",
+        f"{RES}/README_{DATASET}_refdb.md",
+    ]
+    if config["outputs"].get("plot", True):
+        out.append(f"{RES}/{DATASET}_refdb_overview.png")
+    return out
+
+
+localrules:
+    all,
+    dump_config,
+
+
+rule all:
+    input:
+        final_outputs(),
+
+
+rule dump_config:
+    """Freeze the merged config so every step sees the same settings, and so a
+    config change triggers a rebuild of the steps that depend on it."""
+    output:
+        CONFIG_JSON,
+    params:
+        cfg=config,
+    run:
+        Path(output[0]).parent.mkdir(parents=True, exist_ok=True)
+        with open(output[0], "w", encoding="utf-8") as fh:
+            json.dump(dict(params.cfg), fh, indent=2, sort_keys=True)
+
+
+include: "rules/retrieve.smk"
+include: "rules/curate.smk"
+include: "rules/build.smk"
+
+
+onsuccess:
+    print(f"\nReference database written to {RES}/ -- see README_{DATASET}_refdb.md for counts and provenance.")
+
+
+onerror:
+    print("\nFailed. If Entrez timed out or rate-limited: set NCBI_API_KEY and re-run -- "
+          "downloaded records are cached, so only the failed step repeats.")

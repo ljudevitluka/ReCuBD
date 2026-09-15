@@ -1,0 +1,8 @@
+name: host-virus-refdb
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.9
+  - pandas>=2.0
+  - matplotlib-base>=3.7   # headless: the plot script forces the Agg backend
+  - tabulate>=0.9          # required by pandas.DataFrame.to_markdown() in write_outputs.py

@@ -1,9 +1,8 @@
 # host-virus-refdb
 
 A Snakemake workflow that builds a curated, reproducible **virus reference database for a host
-taxon** from NCBI GenBank/RefSeq. Nothing about the target taxon is hard-coded: three tab-separated
-input files define the scope, so the same workflow builds a crayfish database, a shrimp database, or
-a database for any other host group.
+taxon** from NCBI GenBank/RefSeq. Three tab-separated input files define the scope, so the same 
+workflow builds a database for any host group.
 
 It was written for crayfish virome work (the shipped `config/` reproduces that build), but the only
 taxon-specific knowledge lives in the input files.
@@ -12,9 +11,9 @@ taxon-specific knowledge lives in the input files.
 
 | Output | Description |
 |---|---|
-| `<dataset>_refdb_tier1.fasta` | Representative genomes plausibly infecting the host taxon or its relatives |
+| `<dataset>_refdb_tier1.fasta` | Representative viral genomes plausibly infecting the host taxon or its relatives |
 | `<dataset>_refdb_tier2.fasta` | Viruses of plants, fungi, algae and gut bacteria recovered from the same samples — a decoy set for read screening |
-| `<dataset>_refdb_all.fasta` | Both tiers |
+| `<dataset>_refdb_all.fasta` | Fasta file containing sequences belonging to both tiers |
 | `<dataset>_reference_genomes.tsv` | Metadata for every sequence in the FASTA files (30 columns) |
 | `<dataset>_all_records.tsv` | Every curated host-taxon record, before representative selection |
 | `<dataset>_species_summary.tsv` | One row per virus taxon: hosts, countries, years, PubMed IDs, representative |

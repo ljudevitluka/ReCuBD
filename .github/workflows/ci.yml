@@ -1,0 +1,38 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  dryrun:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install "snakemake>=7.32" pandas matplotlib tabulate
+      - name: Dry run (no network calls)
+        run: snakemake --cores 1 -n
+
+  smoke-build:
+    # Real end-to-end build against NCBI, one crayfish genus (~5 records).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install "snakemake>=7.32" pandas matplotlib tabulate
+      - name: Build the test database
+        run: snakemake --cores 1 --configfile config/config.test.yaml
+      - name: Check the deliverables exist and are non-empty
+        run: |
+          set -euo pipefail
+          for f in results_test/test_faxonius_refdb_tier1.fasta \
+                   results_test/test_faxonius_reference_genomes.tsv \
+                   results_test/README_test_faxonius_refdb.md; do
+            test -s "$f" || { echo "missing or empty: $f"; exit 1; }
+          done
+          grep -c '^>' results_test/test_faxonius_refdb_all.fasta
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-database
+          path: results_test/*.fasta

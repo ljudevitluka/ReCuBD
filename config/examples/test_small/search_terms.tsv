@@ -1,0 +1,5 @@
+# Smoke-test scope: a single crayfish genus.
+term	field	use	note
+Faxonius	All Fields	both	north-american crayfish genus
+crayfish		name	name-only
+decapod		name	name-only

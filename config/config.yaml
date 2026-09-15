@@ -1,0 +1,47 @@
+# ---------------------------------------------------------------------------
+# host-virus-refdb: build a curated virus reference database for a host taxon
+# Everything taxon-specific lives in the three input files below.
+# ---------------------------------------------------------------------------
+
+inputs:
+  # Terms used to find records and/or to recognise host-named viruses
+  search_terms: config/search_terms.tsv
+  # Which host clades / vernacular names count as "my host taxon"
+  host_accept: config/host_accept.tsv
+  # Viral groups treated as tier 2 (diet / environment / microbiome) or rejected as phages
+  tier2_groups: config/tier2_groups.tsv
+
+runtime:
+  # Interpreter used to run the step scripts. "python" is right inside a conda
+  # env; use "python3" (or an absolute path) on a bare Linux server without conda.
+  python_exe: python
+
+entrez:
+  virus_taxid_root: 10239      # Viruses. Entrez subtree that records must belong to
+  batch_size: 200              # records per efetch call
+  sleep_seconds: 0.4           # 0.4 without an API key (3 req/s), 0.15 with one
+  email: ""                    # optional contact address; NCBI asks for one
+  api_key_env: NCBI_API_KEY    # optional env var holding an NCBI API key (10 req/s)
+
+curation:
+  accept_virus_name_match: true   # keep a host-less record if the virus NAME carries a host term
+  accept_isolation_source: true   # keep a host-less record if /isolation_source names the host
+  reject_symbiont_sources: true   # ...but not when that source is a symbiont of the host
+  reject_phages: true             # drop groups marked kind=phage in tier2_groups.tsv
+  completeness:
+    near_complete_min_pct: 85     # % of the family-calibrated reference length
+    substantial_fragment_min_pct: 50
+
+augmentation:
+  # For a virus reported from the host taxon but represented only by fragments,
+  # pull the complete genome deposited from any other host.
+  enabled: true
+  title_terms: ["complete genome", "complete sequence"]
+  include_refseq: true
+  max_per_chunk: 400
+  taxids_per_query: 60
+
+outputs:
+  prefix: results
+  dataset_name: crayfish_virus   # output filename stem
+  plot: true

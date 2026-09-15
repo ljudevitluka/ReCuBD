@@ -1,0 +1,15 @@
+# Full development environment: the workflow runtime plus Snakemake itself.
+#   conda env create -f environment.yaml
+#   conda activate host-virus-refdb
+# workflow/envs/refdb.yaml holds only the per-rule runtime dependencies and is
+# what --use-conda provisions.
+name: host-virus-refdb
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python>=3.9
+  - snakemake-minimal>=7.32
+  - pandas>=2.0
+  - matplotlib-base>=3.7
+  - tabulate>=0.9

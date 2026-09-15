@@ -1,0 +1,14 @@
+# Which hosts count as the target taxon. Every distinct GenBank /host string is
+# resolved against NCBI Taxonomy; a record is kept when the resolved lineage
+# contains one of the clades below, or when the raw string matches a vernacular
+# pattern (case-insensitive regex).
+#   kind : clade | vernacular
+kind	value	note
+clade	Astacidea	infraorder containing all crayfish and clawed lobsters
+clade	Astacoidea	northern-hemisphere crayfish
+clade	Parastacoidea	southern-hemisphere crayfish
+vernacular	crayfish	
+vernacular	crawfish	
+vernacular	crawdad	
+vernacular	yabby	
+vernacular	redclaw	

@@ -1,0 +1,42 @@
+# Viral groups that should NOT be treated as candidate pathogens of the host.
+#   group : any taxon name appearing in the GenBank lineage (family, order, class...)
+#   kind  : environmental -> tier 2 (diet, water, gut contents; useful as a decoy set)
+#           phage         -> rejected outright (true host is a microbiome bacterium)
+# A virus whose NAME carries a host term (see search_terms.tsv, use=name/both)
+# stays in tier 1 even if its family is listed here.
+group	kind	note
+Tombusviridae	environmental	plant
+Botourmiaviridae	environmental	fungal/plant
+Marnaviridae	environmental	algal
+Solemoviridae	environmental	plant
+Potyviridae	environmental	plant
+Virgaviridae	environmental	plant
+Tymoviridae	environmental	plant
+Benyviridae	environmental	plant
+Bromoviridae	environmental	plant
+Closteroviridae	environmental	plant
+Geminiviridae	environmental	plant
+Nanoviridae	environmental	plant
+Aspiviridae	environmental	plant
+Amalgaviridae	environmental	plant
+Deltaflexiviridae	environmental	fungal
+Alphaflexiviridae	environmental	plant/fungal
+Betaflexiviridae	environmental	plant
+Narnaviridae	environmental	fungal
+Mitoviridae	environmental	fungal mitochondrial
+Partitiviridae	environmental	fungal/plant
+Endornaviridae	environmental	plant/fungal
+Orthototiviridae	environmental	fungal/protozoal
+Hypoviridae	environmental	fungal
+Chrysoviridae	environmental	fungal
+Phycodnaviridae	environmental	algal
+Caudoviricetes	phage	tailed dsDNA bacteriophages
+Leviviricetes	phage	ssRNA bacteriophages
+Norzivirales	phage	
+Timlovirales	phage	
+Tectiliviricetes	phage	
+Cystoviridae	phage	
+Microviridae	phage	
+Inoviridae	phage	
+Fiersviridae	phage	
+Steitzviridae	phage	

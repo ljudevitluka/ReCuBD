@@ -1,0 +1,16 @@
+# Example: swap the host taxon to penaeid shrimp. Point config.yaml at this file.
+term	field	use	note
+Penaeus	All Fields	both	
+Litopenaeus	All Fields	both	synonym of Penaeus
+Marsupenaeus	All Fields	both	
+Fenneropenaeus	All Fields	both	
+Metapenaeus	All Fields	both	
+Metapenaeopsis	All Fields	both	
+Trachypenaeus	All Fields	both	
+Penaeidae	All Fields	query	
+shrimp	All Fields	both	
+prawn	All Fields	both	
+whiteleg shrimp	All Fields	query	
+black tiger shrimp	All Fields	query	
+crayfish		name	name-only: keeps crayfish-named decapod viruses in tier 1
+decapod		name	name-only

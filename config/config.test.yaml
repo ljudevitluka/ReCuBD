@@ -1,0 +1,39 @@
+# Small smoke test: one crayfish genus, a handful of records. Run with
+#   snakemake --cores 1 --configfile config/config.test.yaml
+inputs:
+  search_terms: config/examples/test_small/search_terms.tsv
+  host_accept: config/host_accept.tsv
+  tier2_groups: config/tier2_groups.tsv
+
+runtime:
+  # Interpreter used to run the step scripts. "python" is right inside a conda
+  # env; use "python3" (or an absolute path) on a bare Linux server without conda.
+  python_exe: python
+
+entrez:
+  virus_taxid_root: 10239
+  batch_size: 100
+  sleep_seconds: 0.4
+  email: ""
+  api_key_env: NCBI_API_KEY
+
+curation:
+  accept_virus_name_match: true
+  accept_isolation_source: true
+  reject_symbiont_sources: true
+  reject_phages: true
+  completeness:
+    near_complete_min_pct: 85
+    substantial_fragment_min_pct: 50
+
+augmentation:
+  enabled: true
+  title_terms: ["complete genome", "complete sequence"]
+  include_refseq: true
+  max_per_chunk: 50
+  taxids_per_query: 60
+
+outputs:
+  prefix: results_test
+  dataset_name: test_faxonius
+  plot: true
