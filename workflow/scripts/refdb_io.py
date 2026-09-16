@@ -15,11 +15,17 @@ def read_config_tsv(path, required):
     with open(path, encoding="utf-8") as fh:
         for line in fh:
             line = line.rstrip("\n")
-            if not line.strip() or line.lstrip().startswith("#"):
+            stripped = line.strip()
+            if not stripped:
                 continue
-            fields = line.split("\t")
+            comment = stripped.lstrip("\ufeff")
+            if comment.startswith('"'):
+                comment = comment[1:].lstrip()
+            if comment.startswith("#"):
+                continue
+            fields = [f.strip().strip('"') for f in line.split("\t")]
             if header is None:
-                header = [f.strip() for f in fields]
+                header = fields
                 missing = [c for c in required if c not in header]
                 if missing:
                     raise ValueError(path + ": missing required column(s) " + ", ".join(missing))
