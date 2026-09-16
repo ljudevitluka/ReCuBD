@@ -1,9 +1,9 @@
-# Viral groups that should NOT be treated as candidate pathogens of the host.
-#   group : any taxon name appearing in the GenBank lineage (family, order, class...)
-#   kind  : environmental -> tier 2 (diet, water, gut contents; useful as a decoy set)
-#           phage         -> rejected outright (true host is a microbiome bacterium)
-# A virus whose NAME carries a host term (see search_terms.tsv, use=name/both)
-# stays in tier 1 even if its family is listed here.
+# Viral groups that should NOT be treated as candidate pathogens of the host.		
+"#   group : any taxon name appearing in the GenBank lineage (family, order, class...)"		
+"#   kind  : environmental -> tier 2 (diet, water, gut contents; useful as a decoy set)"		
+#           phage         -> rejected outright (true host is a microbiome bacterium)		
+"# A virus whose NAME carries a host term (see search_terms.tsv, use=name/both)"		
+# stays in tier 1 even if its family is listed here.		
 group	kind	note
 Tombusviridae	environmental	plant
 Botourmiaviridae	environmental	fungal/plant

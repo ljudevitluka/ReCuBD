@@ -18,7 +18,7 @@ runtime:
 
 entrez:
   virus_taxid_root: 10239      # Viruses. Entrez subtree that records must belong to
-  batch_size: 200              # records per efetch call
+  batch_size: 10              # records per efetch call
   sleep_seconds: 0.4           # 0.4 without an API key (3 req/s), 0.15 with one
   email: ""                    # optional contact address; NCBI asks for one
   api_key_env: NCBI_API_KEY    # optional env var holding an NCBI API key (10 req/s)

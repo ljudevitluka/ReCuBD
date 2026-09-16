@@ -12,7 +12,7 @@ runtime:
 
 entrez:
   virus_taxid_root: 10239
-  batch_size: 100
+  batch_size: 10
   sleep_seconds: 0.4
   email: ""
   api_key_env: NCBI_API_KEY

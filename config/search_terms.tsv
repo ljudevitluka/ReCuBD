@@ -1,64 +1,62 @@
-# Terms that define the host taxon. Replace this file to target a different one.
-#   field : any Entrez field, e.g. "All Fields", "Organism", "Title"
-#   use   : query  -> only used to retrieve records
-#           name   -> only used to recognise host-named viruses (e.g. "shrimp" in a virus name)
-#           both   -> used for both
-#
-# Choosing `use`. The name-side regex does two jobs: it keeps a virus in tier 1 when its own
-# name carries a host term even though its family is listed as environmental in
-# tier2_groups.tsv, and it accepts a record with no /host qualifier when the virus name names
-# the host. Both depend on how viruses are actually named -- after a genus, species or
-# vernacular (Cherax quadricarinatus iridovirus; signal crayfish associated hepe-like virus 1).
-# So:
-#   both  -- genus names and single-word vernaculars: they retrieve records AND appear in names.
-#   name  -- terms that must NOT enter the query. "shrimp", "prawn", "decapod" and "penstyl"
-#            would each pull in thousands of penaeid records and break the crayfish-only scope,
-#            but they must be recognised in names so Decapod penstyldensovirus 1 and Shrimp
-#            white spot syndrome virus stay in tier 1.
-#   query -- terms safe to search that would never occur in a virus name: family and infraorder
-#            names, multi-word vernaculars. No viral record in GenBank carries a crayfish FAMILY
-#            name in its organism name, so the four family rows below are forward-looking safety
-#            nets (they would catch a future /host="Cambaridae sp." deposit) and currently match
-#            nothing; an OR clause that matches nothing cannot change the result set.
+# Terms that define the host taxon.			
+"#   field : any Entrez field, e.g. ""All Fields"", ""Organism"", ""Title"""			
+#   use   : query  -> only used to retrieve records			
+"#           name   -> only used to recognise host-named viruses (e.g. ""shrimp"" in a virus name)"			
+#           both   -> used for both			
+# Replace this file to target a different host taxon.			
 term	field	use	note
-Astacus	All Fields	both	European crayfish genus
-Pontastacus	All Fields	both	current genus of A. leptodactylus
-Austropotamobius	All Fields	both	
-Pacifastacus	All Fields	both	signal crayfish
-Procambarus	All Fields	both	
-Orconectes	All Fields	both	former name of Faxonius
-Faxonius	All Fields	both	
-Cambarus	All Fields	both	
-Cambarellus	All Fields	both	
-Cambaroides	All Fields	both	
-Cherax	All Fields	both	redclaw, yabby, marron
-Euastacus	All Fields	both	
-Paranephrops	All Fields	both	
-Astacopsis	All Fields	both	
-Engaeus	All Fields	both	
-Engaewa	All Fields	both	
-Parastacus	All Fields	both	
-Samastacus	All Fields	both	
-Virilastacus	All Fields	both	
-Astacoides	All Fields	both	
-Geocharax	All Fields	both	
-Gramastacus	All Fields	both	
-Tenuibranchiurus	All Fields	both	
-Ombrastacoides	All Fields	both	
-Astacidae	All Fields	query	family-level term
-Cambaridae	All Fields	query	
-Parastacidae	All Fields	query	
-Cambaroididae	All Fields	query	
-Astacidea	All Fields	query	infraorder
+Astacidae	All Fields	both	family-level term
+Cambaridae	All Fields	both	
+Parastacidae	All Fields	both	
+Cambaroididae	All Fields	both	
+Astacidea	All Fields	both	infraorder
 crayfish	All Fields	both	
 crawfish	All Fields	both	
 crawdad	All Fields	both	
 yabby	All Fields	both	
-redclaw	All Fields	both	
-noble crayfish	All Fields	query	
-signal crayfish	All Fields	query	
-marbled crayfish	All Fields	query	
-shrimp		name	name-only: keeps decapod-named viruses in tier 1 without pulling all shrimp viruses
+shrimp		name	name-only
 prawn		name	name-only
 decapod		name	name-only
-penstyl		name	name-only (Decapod penstyldensovirus)
+Decapoda		name	
+lobster		name	
+crab		name	
+Reptantia		name	
+Brachyura		name	
+Anomura		name	
+Gebiidea		name	
+Axiidea		name	
+Achelata		name	
+Polychelida		name	
+Caridea		name	
+Procarididea		name	
+Stenopodidea 		name	
+Dendrobranchiata 		name	
+Astacoides		both	
+Astacopsis		both	
+Astacus		both	
+Austropotamobius		both	
+Barbicambarus		both	
+Bouchardina		both	
+Cambarellus		both	
+Cambaroides		both	
+Cambarus		both	
+Cherax		both	
+Creaserinus		both	
+Distocambarus		both	
+Engaeus		both	
+Engaewa		both	
+Euastacus		both	
+Fallicambarus		both	
+Faxonella		both	
+Faxonius		both	
+Geocharax		both	
+Gramastacus		both	
+Hobbseus		both	
+Lacunicambarus		both	
+Ombrastacoides		both	
+Orconectes		both	
+Pacifastacus		both	
+Paranephrops		both	
+Parastacus		both	
+Pontastacus		both	
+Procambarus		both	
