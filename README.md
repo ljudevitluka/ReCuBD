@@ -1,4 +1,4 @@
-# host-virus-refdb
+# ReCuBD - Retrive, Curate, Build Database
 
 A Snakemake workflow that builds a curated, reproducible **virus reference database for a host
 taxon** from NCBI GenBank/RefSeq. Nothing about the target taxon is hard-coded: three tab-separated
