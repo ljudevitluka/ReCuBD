@@ -80,13 +80,13 @@ def main():
 
     if len(fam):
         b.barh(range(len(fam)), fam[TIER1].values, color=C1, height=0.72,
-               label="host/related-infecting")
+               label="Host related")
         b.barh(range(len(fam)), fam[TIER2].values, left=fam[TIER1].values, color=C2, height=0.72,
-               label="environmental, diet or microbiome")
+               label="Environmental, diet or microbiome")
         b.set_yticks(range(len(fam)))
         italicise(b, list(fam.index))
         b.legend(frameon=False, loc="lower right")
-    b.set_xlabel("representative genomes")
+    b.set_xlabel("Representative genomes (n)")
     b.set_title("Viral families in the reference set")
     b.margins(x=0.06, y=0.03)
 
@@ -96,7 +96,7 @@ def main():
     c.set_yticks(y)
     c.set_yticklabels([s.replace(" ", "\n") if len(s) > 16 else s for s in status.index])
     c.invert_yaxis()
-    c.set_xlabel("representative genomes")
+    c.set_xlabel("Representative genomes")
     t1 = reps[reps.tier == TIER1]
     usable = ["complete genome", "coding-complete", "near-complete"]
     c.set_title("%d of %d tier-1 entries are genome-scale"
@@ -109,10 +109,10 @@ def main():
     bins = np.logspace(np.log10(lo * 0.9), np.log10(hi * 1.1), 34)
     d.hist([reps.loc[reps.tier == TIER1, "length_bp"].dropna(),
             reps.loc[reps.tier == TIER2, "length_bp"].dropna()],
-           bins=bins, stacked=True, color=[C1, C2], label=["tier 1", "tier 2"])
+           bins=bins, stacked=True, color=[C1, C2], label=["Host related", "Environmental, diet or microbiome"])
     d.set_xscale("log")
-    d.set_xlabel("sequence length (bp, log scale)")
-    d.set_ylabel("representative genomes", labelpad=2)
+    d.set_xlabel("Sequence length (bp, log scale)")
+    d.set_ylabel("Representative genomes", labelpad=2)
     d.set_title("Sequence length spans %.1f kb to %.0f kb" % (lo / 1000, hi / 1000))
     d.legend(frameon=False, loc="upper left")
     d.margins(x=0.03)
