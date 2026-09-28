@@ -7,7 +7,7 @@ a database for any other host group.
 
 It was written for crayfish virome work (the shipped `config/` reproduces that build), but the only
 taxon-specific knowledge lives in the input files.
-
+![Pipeline overview](Pipeline.png)
 ## What it produces
 
 | Output | Description |
