@@ -1,12 +1,12 @@
 # ReCuBD - Retrive, Curate, Build Database
 
 A Snakemake workflow that builds a curated, reproducible **virus reference database for a host
-taxon** from NCBI GenBank/RefSeq. Nothing about the target taxon is hard-coded: three tab-separated
-input files define the scope, so the same workflow builds a crayfish database, a shrimp database, or
-a database for any other host group.
+taxon** from NCBI GenBank/RefSeq. 
+The taxonomic scope of the database can be easily modified through changes in the three tab-separated
+input files that define the taxonomic scope. In this way the pipeline can be adapted for any taxonomic group. 
 
-It was written for crayfish virome work (the shipped `config/` reproduces that build), but the only
-taxon-specific knowledge lives in the input files.
+Example dataset is was written for crayfish virome work (the shipped `config/` reproduces that build).
+A worked second example is in `config/examples/penaeid_shrimp/`.
 
 ![Pipeline overview](Pipeline_overview.png)
 ## What it produces
@@ -14,20 +14,20 @@ taxon-specific knowledge lives in the input files.
 | Output | Description |
 |---|---|
 | `<dataset>_refdb_tier1.fasta` | Representative genomes plausibly infecting the host taxon or its relatives |
-| `<dataset>_refdb_tier2.fasta` | Viruses of plants, fungi, algae and gut bacteria recovered from the same samples — a decoy set for read screening |
+| `<dataset>_refdb_tier2.fasta` | Viruses of plants, fungi, algae and gut bacteria recovered from the same samples (decoy dataset) |
 | `<dataset>_refdb_all.fasta` | Both tiers |
 | `<dataset>_reference_genomes.tsv` | Metadata for every sequence in the FASTA files (30 columns) |
 | `<dataset>_all_records.tsv` | Every curated host-taxon record, before representative selection |
 | `<dataset>_species_summary.tsv` | One row per virus taxon: hosts, countries, years, PubMed IDs, representative |
-| `<dataset>_excluded_records.tsv` | Retrieved but rejected, each with its reason — the audit trail |
-| `tables/augment_similarity_audit.tsv` | Every screened candidate reference genome with its containment score and pass/fail reason |
+| `<dataset>_excluded_records.tsv` | Retrieved but rejected viral records |
+| `tables/augment_similarity_audit.tsv` | Screened candidate reference genomes with its containment score and pass/fail reason |
 | `<dataset>_refdb_overview.png` | Composition figure |
 | `README_<dataset>_refdb.md` | Build report: exact query, counts, method, caveats |
 
 ## Quick start
 
 ```bash
-git clone <your-fork-url> && cd host-virus-refdb
+git clone https://github.com/ljudevitluka/ReCuBD && cd host-virus-refdb
 conda env create -f environment.yaml && conda activate host-virus-refdb
 
 export NCBI_API_KEY=...          # optional but recommended: 10 requests/s instead of 3
@@ -44,7 +44,7 @@ snakemake --cores 1 --configfile config/config.test.yaml
 Outputs land in `results/`. Rerunning is cheap: downloaded GenBank XML is cached, so changing a
 curation rule re-runs only the curation and build steps.
 
-## Retargeting it to another host taxon
+## Modifying the target host taxon
 
 Edit three files (all comment-documented, all tab-separated):
 
@@ -53,9 +53,9 @@ The `use` column controls how each term is applied:
 
 | `use` | Effect |
 |---|---|
-| `query` | included in the Entrez query only |
-| `name` | used only to recognise host-named viruses, so they stay in tier 1 — e.g. `shrimp`, `decapod` |
-| `both` | both of the above |
+| `query` | the term is included in the Entrez query only |
+| `name` | the term used only to recognise host-named viruses, so they stay in tier 1 — e.g. `crayfish`, `shrimp`, `decapod` |
+| `both` | the term for both of the above |
 
 **`config/host_accept.tsv`** — which hosts count. Every distinct GenBank `/host` string is resolved
 against NCBI Taxonomy and kept only if its lineage contains one of your `clade` rows, or the raw
@@ -64,11 +64,12 @@ build, "marron" (a *Cherax* vernacular) also matches *Castanea sativa* cv. "Marr
 cultivars, and the taxonomy check discards those records.
 
 **`config/tier2_groups.tsv`** — viral groups that are *not* candidate pathogens of your host.
-`kind=environmental` sends a group to tier 2; `kind=phage` rejects it outright. Any taxon name that
+`kind=environmental` sends a group to tier 2; `kind=phage` rejects the taxa outright. Any taxon name that
 appears in a GenBank lineage works (family, order, class).
 
-Then set `outputs.dataset_name` in `config/config.yaml` and run. A worked second example is in
-`config/examples/penaeid_shrimp/`.
+Then set `outputs.dataset_name` in `config/config.yaml` and run. 
+
+
 
 ## Curation logic
 
